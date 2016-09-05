@@ -15,6 +15,7 @@
   "scripts": {
     "unit-test": "mocha \"test/**/*.test.js\" --compilers js:babel-register",
     "posttest": "npm run eslint",
+    "postinstall": "npm run prepublish",
     "prepublish": "npm run lib",
     "eslint": "node_modules/.bin/eslint src/**/*.js",
     "test": "npm run unit-test",
