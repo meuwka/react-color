@@ -128,6 +128,7 @@ export class EditableInput extends React.Component {
           onKeyDown={ this.handleKeyDown }
           onChange={ this.handleChange }
           onBlur={ this.handleBlur }
+          onFocus={ if(this.props.onFocus) this.props.onFocus }
         />
         { this.props.label ? (
           <span style={ styles.label } ref="label" onMouseDown={ this.handleMouseDown }>
