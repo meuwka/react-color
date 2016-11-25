@@ -1,7 +1,7 @@
 import React from 'react'
 import reactCSS from 'reactcss'
 
-export const PhotoshopBotton = (props) => {
+export const PhotoshopBotton = ({ onClick, label, children, active }) => {
   const styles = reactCSS({
     'default': {
       button: {
@@ -15,6 +15,7 @@ export const PhotoshopBotton = (props) => {
         lineHeight: '20px',
         textAlign: 'center',
         marginBottom: '10px',
+        cursor: 'pointer',
       },
     },
     'active': {
@@ -22,15 +23,11 @@ export const PhotoshopBotton = (props) => {
         boxShadow: '0 0 0 1px #878787',
       },
     },
-  }, props)
-
-  const handleClick = (e) => {
-    props.onClick && props.onClick(e)
-  }
+  }, { active })
 
   return (
-    <div style={ styles.button } onClick={ handleClick }>
-      { props.label || props.children }
+    <div style={ styles.button } onClick={ onClick }>
+      { label || children }
     </div>
   )
 }

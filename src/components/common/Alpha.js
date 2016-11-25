@@ -1,47 +1,20 @@
-'use strict' /* @flow */
-
-import React from 'react'
+import React, { Component, PureComponent } from 'react'
 import reactCSS from 'reactcss'
-import shallowCompare from 'react-addons-shallow-compare'
+import * as alpha from '../../helpers/alpha'
 
 import Checkboard from './Checkboard'
 
-export class Alpha extends React.Component {
-  shouldComponentUpdate = shallowCompare.bind(this, this, arguments[0], arguments[1])
-
+export class Alpha extends (PureComponent || Component) {
   componentWillUnmount() {
     this.unbindEventListeners()
   }
 
-  handleChange = (e: any, skip: boolean) => {
-    !skip && e.preventDefault()
-    const container = this.refs.container
-    const containerWidth = container.clientWidth
-    const x = typeof e.pageX === 'number' ? e.pageX : e.touches[0].pageX
-    const inIFrame = window.self !== window.top || window.document !== container.ownerDocument
-    const left = x - (container.getBoundingClientRect().left + (inIFrame ? 0 : window.pageXOffset))
-
-    let a
-    if (left < 0) {
-      a = 0
-    } else if (left > containerWidth) {
-      a = 1
-    } else {
-      a = Math.round(left * 100 / containerWidth) / 100
-    }
-
-    if (this.props.a !== a) {
-      this.props.onChange({
-        h: this.props.hsl.h,
-        s: this.props.hsl.s,
-        l: this.props.hsl.l,
-        a,
-        source: 'rgb',
-      })
-    }
+  handleChange = (e, skip) => {
+    const change = alpha.calculateChange(e, skip, this.props, this.refs.container)
+    change && this.props.onChange(change, e)
   }
 
-  handleMouseDown = (e: any) => {
+  handleMouseDown = (e) => {
     this.handleChange(e, true)
     window.addEventListener('mousemove', this.handleChange)
     window.addEventListener('mouseup', this.handleMouseUp)
@@ -56,7 +29,7 @@ export class Alpha extends React.Component {
     window.removeEventListener('mouseup', this.handleMouseUp)
   }
 
-  render(): any {
+  render() {
     const rgb = this.props.rgb
     const styles = reactCSS({
       'default': {
@@ -94,13 +67,23 @@ export class Alpha extends React.Component {
           transform: 'translateX(-2px)',
         },
       },
+      'vertical': {
+        gradient: {
+          background: `linear-gradient(to bottom, rgba(${ rgb.r },${ rgb.g },${ rgb.b }, 0) 0%,
+           rgba(${ rgb.r },${ rgb.g },${ rgb.b }, 1) 100%)`,
+        },
+        pointer: {
+          left: 0,
+          top: `${ rgb.a * 100 }%`,
+        },
+      },
+      'overwrite': {
+        ...this.props.style,
+      },
+    }, {
+      vertical: this.props.direction === 'vertical',
+      overwrite: true,
     })
-
-    let pointer = this.props.pointer ? (
-      <this.props.pointer { ...this.props } />
-    ) : (
-      <div style={ styles.slider } />
-    )
 
     return (
       <div style={ styles.alpha }>
@@ -115,8 +98,12 @@ export class Alpha extends React.Component {
           onTouchMove={ this.handleChange }
           onTouchStart={ this.handleChange }
         >
-          <div style={ styles.pointer } ref="pointer">
-            { pointer }
+          <div style={ styles.pointer }>
+            { this.props.pointer ? (
+              <this.props.pointer { ...this.props } />
+            ) : (
+              <div style={ styles.slider } />
+            ) }
           </div>
         </div>
       </div>

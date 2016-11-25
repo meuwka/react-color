@@ -34,7 +34,7 @@ var Grid = function (_React$Component) {
   _createClass(Grid, [{
     key: 'render',
     value: function render() {
-
+      var isMobile = document.getElementById('root').clientWidth < 500;
       var styles = (0, _reactcss2.default)({
         'default': {
           grid: {
@@ -80,7 +80,18 @@ var Grid = function (_React$Component) {
             height: '100%'
           },
           main: {
-            paddingLeft: '455px'
+            paddingLeft: '460px'
+          }
+        },
+
+        'preset-four': {
+          left: {
+            width: '170px',
+            position: 'absolute',
+            height: '100%'
+          },
+          main: {
+            paddingLeft: '210px'
           }
         },
 
@@ -94,7 +105,7 @@ var Grid = function (_React$Component) {
         },
         'mobile-one': {
           left: {
-            paddingRight: '0'
+            paddingRight: '0px'
           },
           main: {
             display: 'none'
@@ -119,13 +130,24 @@ var Grid = function (_React$Component) {
           grid: {
             display: 'none'
           }
+        },
+        'mobile-four': {
+          grid: {
+            display: 'none'
+          }
         }
       }, {
-        'mobile-default': this.props.preset === 'default' && document.getElementById('root').clientWidth < 500,
-        'mobile-one': this.props.preset === 'one' && document.getElementById('root').clientWidth < 500,
-        'mobile-two': this.props.preset === 'two' && document.getElementById('root').clientWidth < 500,
-        'mobile-three': this.props.preset === 'three' && document.getElementById('root').clientWidth < 500
-      }, this.props);
+        'preset-default': this.props.preset === 'default',
+        'preset-one': this.props.preset === 'one',
+        'preset-two': this.props.preset === 'two',
+        'preset-three': this.props.preset === 'three',
+        'preset-four': this.props.preset === 'four',
+        'mobile-default': this.props.preset === 'default' && isMobile,
+        'mobile-one': this.props.preset === 'one' && isMobile,
+        'mobile-two': this.props.preset === 'two' && isMobile,
+        'mobile-three': this.props.preset === 'three' && isMobile,
+        'mobile-four': this.props.preset === 'four' && isMobile
+      });
 
       return _react2.default.createElement(
         'div',

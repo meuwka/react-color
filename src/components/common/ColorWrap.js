@@ -1,46 +1,41 @@
-'use strict' /* @flow */
-
-import React from 'react'
-import merge from 'merge'
+import React, { Component, PureComponent } from 'react'
 import debounce from 'lodash/debounce'
 import color from '../../helpers/color'
-import shallowCompare from 'react-addons-shallow-compare'
 
 export const ColorWrap = (Picker) => {
-  class ColorPicker extends React.Component {
-
-
-    constructor(props: any) {
+  class ColorPicker extends (PureComponent || Component) {
+    constructor(props) {
       super()
 
-      this.state = merge(color.toState(props.color, 0), {
+      this.state = {
+        ...color.toState(props.color, 0),
         visible: props.display,
-      })
+      }
 
-      this.debounce = debounce((fn: any, data: any) => {
-        fn(data)
+      this.debounce = debounce((fn, data, event) => {
+        fn(data, event)
       }, 100)
     }
 
-    componentWillReceiveProps(nextProps: any) {
-      this.setState(merge(color.toState(nextProps.color, this.state.oldHue), {
+    componentWillReceiveProps(nextProps) {
+      this.setState({
+        ...color.toState(nextProps.color, this.state.oldHue),
         visible: nextProps.display,
-      }))
+      })
     }
 
-    shouldComponentUpdate = shallowCompare.bind(this, this, arguments[0], arguments[1]);
 
-    handleChange = (data: any) => {
+    handleChange = (data, event) => {
       const isValidColor = color.simpleCheckForValidColor(data)
       if (isValidColor) {
         const colors = color.toState(data, data.h || this.state.oldHue)
         this.setState(colors)
-        this.props.onChangeComplete && this.debounce(this.props.onChangeComplete, colors)
-        this.props.onChange && this.props.onChange(colors)
+        this.props.onChangeComplete && this.debounce(this.props.onChangeComplete, colors, event)
+        this.props.onChange && this.props.onChange(colors, event)
       }
     }
 
-    render(): any {
+    render() {
       return <Picker { ...this.props } { ...this.state } onChange={ this.handleChange } />
     }
   }

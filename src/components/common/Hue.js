@@ -1,71 +1,18 @@
-'use strict' /* @flow */
-
-import React from 'react'
+import React, { Component, PureComponent } from 'react'
 import reactCSS from 'reactcss'
-import shallowCompare from 'react-addons-shallow-compare'
+import * as hue from '../../helpers/hue'
 
-export class Hue extends React.Component {
-  shouldComponentUpdate = shallowCompare.bind(this, this, arguments[0], arguments[1])
-
+export class Hue extends (PureComponent || Component) {
   componentWillUnmount() {
     this.unbindEventListeners()
   }
 
-  handleChange = (e: any, skip: boolean) => {
-    !skip && e.preventDefault()
-    const container = this.refs.container
-    const containerWidth = container.clientWidth
-    const containerHeight = container.clientHeight
-    const x = typeof e.pageX === 'number' ? e.pageX : e.touches[0].pageX
-    const y = typeof e.pageY === 'number' ? e.pageY : e.touches[0].pageY
-    const inIFrame = window.self !== window.top || window.document !== container.ownerDocument
-    const left = x - (container.getBoundingClientRect().left + (inIFrame ? 0 : window.pageXOffset))
-    const top = y - (container.getBoundingClientRect().top + (inIFrame ? 0 : window.pageYOffset))
-
-    if (this.props.direction === 'vertical') {
-      let h
-      if (top < 0) {
-        h = 359
-      } else if (top > containerHeight) {
-        h = 0
-      } else {
-        const percent = -(top * 100 / containerHeight) + 100
-        h = (360 * percent / 100)
-      }
-
-      if (this.props.hsl.h !== h) {
-        this.props.onChange({
-          h,
-          s: this.props.hsl.s,
-          l: this.props.hsl.l,
-          a: this.props.hsl.a,
-          source: 'rgb',
-        })
-      }
-    } else {
-      let h
-      if (left < 0) {
-        h = 0
-      } else if (left > containerWidth) {
-        h = 359
-      } else {
-        const percent = left * 100 / containerWidth
-        h = (360 * percent / 100)
-      }
-
-      if (this.props.hsl.h !== h) {
-        this.props.onChange({
-          h,
-          s: this.props.hsl.s,
-          l: this.props.hsl.l,
-          a: this.props.hsl.a,
-          source: 'rgb',
-        })
-      }
-    }
+  handleChange = (e, skip) => {
+    const change = hue.calculateChange(e, skip, this.props, this.refs.container)
+    change && this.props.onChange(change, e)
   }
 
-  handleMouseDown = (e: any) => {
+  handleMouseDown = (e) => {
     this.handleChange(e, true)
     window.addEventListener('mousemove', this.handleChange)
     window.addEventListener('mouseup', this.handleMouseUp)
@@ -80,7 +27,7 @@ export class Hue extends React.Component {
     window.removeEventListener('mouseup', this.handleMouseUp)
   }
 
-  render(): any {
+  render() {
     const styles = reactCSS({
       'default': {
         hue: {
@@ -109,7 +56,7 @@ export class Hue extends React.Component {
           transform: 'translateX(-2px)',
         },
       },
-      'direction-vertical': {
+      'vertical': {
         hue: {
           background: `linear-gradient(to top, #f00 0%, #ff0 17%, #0f0 33%,
             #0ff 50%, #00f 67%, #f0f 83%, #f00 100%)`,
@@ -119,7 +66,7 @@ export class Hue extends React.Component {
           top: `${ -((this.props.hsl.h * 100) / 360) + 100 }%`,
         },
       },
-    }, this.props)
+    }, { vertical: this.props.direction === 'vertical' })
 
     return (
       <div style={ styles.hue }>
@@ -130,7 +77,7 @@ export class Hue extends React.Component {
           onTouchMove={ this.handleChange }
           onTouchStart={ this.handleChange }
         >
-          <div style={ styles.pointer } ref="pointer">
+          <div style={ styles.pointer }>
             { this.props.pointer ? (
               <this.props.pointer { ...this.props } />
             ) : (

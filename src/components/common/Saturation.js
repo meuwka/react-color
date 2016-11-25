@@ -1,59 +1,30 @@
-'use strict' /* @flow */
-
-import React from 'react'
+import React, { Component, PureComponent } from 'react'
 import reactCSS from 'reactcss'
 import throttle from 'lodash/throttle'
-import shallowCompare from 'react-addons-shallow-compare'
+import * as saturation from '../../helpers/saturation'
 
-export class Saturation extends React.Component {
-  constructor(props: any) {
+export class Saturation extends (PureComponent || Component) {
+  constructor(props) {
     super(props)
 
-    this.throttle = throttle((fn: any, data: any) => {
-      fn(data)
+    this.throttle = throttle((fn, data, e) => {
+      fn(data, e)
     }, 50)
   }
-
-  shouldComponentUpdate = shallowCompare.bind(this, this, arguments[0], arguments[1]);
 
   componentWillUnmount() {
     this.unbindEventListeners()
   }
 
-  handleChange = (e: any, skip: boolean) => {
-    !skip && e.preventDefault()
-    const container = this.refs.container
-    const containerWidth = container.clientWidth
-    const containerHeight = container.clientHeight
-    const x = typeof e.pageX === 'number' ? e.pageX : e.touches[0].pageX
-    const y = typeof e.pageY === 'number' ? e.pageY : e.touches[0].pageY
-    const inIFrame = window.self !== window.top || window.document !== container.ownerDocument
-    let left = x - (container.getBoundingClientRect().left + (inIFrame ? 0 : window.pageXOffset))
-    let top = y - (container.getBoundingClientRect().top + (inIFrame ? 0 : window.pageYOffset))
-
-    if (left < 0) {
-      left = 0
-    } else if (left > containerWidth) {
-      left = containerWidth
-    } else if (top < 0) {
-      top = 0
-    } else if (top > containerHeight) {
-      top = containerHeight
-    }
-
-    const saturation = left * 100 / containerWidth
-    const bright = -(top * 100 / containerHeight) + 100
-
-    this.throttle(this.props.onChange, {
-      h: this.props.hsl.h,
-      s: saturation,
-      v: bright,
-      a: this.props.hsl.a,
-      source: 'rgb',
-    })
+  handleChange = (e, skip) => {
+    this.throttle(
+      this.props.onChange,
+      saturation.calculateChange(e, skip, this.props, this.refs.container),
+      e
+    )
   }
 
-  handleMouseDown = (e: any) => {
+  handleMouseDown = (e) => {
     this.handleChange(e, true)
     window.addEventListener('mousemove', this.handleChange)
     window.addEventListener('mouseup', this.handleMouseUp)
@@ -68,7 +39,8 @@ export class Saturation extends React.Component {
     window.removeEventListener('mouseup', this.handleMouseUp)
   }
 
-  render(): any {
+  render() {
+    const { color, white, black, pointer, circle } = this.props.style || {}
     const styles = reactCSS({
       'default': {
         color: {
@@ -101,7 +73,14 @@ export class Saturation extends React.Component {
           transform: 'translate(-2px, -2px)',
         },
       },
-    })
+      'custom': {
+        color,
+        white,
+        black,
+        pointer,
+        circle,
+      },
+    }, { 'custom': !!this.props.style })
 
     return (
       <div
@@ -113,7 +92,7 @@ export class Saturation extends React.Component {
       >
         <div style={ styles.white }>
           <div style={ styles.black } />
-          <div style={ styles.pointer } ref="pointer">
+          <div style={ styles.pointer }>
             { this.props.pointer ? (
               <this.props.pointer { ...this.props } />
             ) : (

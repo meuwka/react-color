@@ -1,11 +1,8 @@
-'use strict' /* @flow */
-
-import React from 'react'
+import React, { Component, PureComponent } from 'react'
 import reactCSS from 'reactcss'
-import shallowCompare from 'react-addons-shallow-compare'
 
-export class EditableInput extends React.Component {
-  constructor(props: any) {
+export class EditableInput extends (PureComponent || Component) {
+  constructor(props) {
     super()
 
     this.state = {
@@ -14,7 +11,7 @@ export class EditableInput extends React.Component {
     }
   }
 
-  componentWillReceiveProps(nextProps: any) {
+  componentWillReceiveProps(nextProps) {
     const input = this.refs.input
     if (nextProps.value !== this.state.value) {
       if (input === document.activeElement) {
@@ -24,8 +21,6 @@ export class EditableInput extends React.Component {
       }
     }
   }
-
-  shouldComponentUpdate = shallowCompare.bind(this, this, arguments[0], arguments[1]);
 
   componentWillUnmount() {
     this.unbindEventListeners()
@@ -37,17 +32,17 @@ export class EditableInput extends React.Component {
     }
   }
 
-  handleChange = (e: any) => {
-    if (this.props.label !== null) {
-      this.props.onChange({ [this.props.label]: e.target.value })
+  handleChange = (e) => {
+    if (!!this.props.label) {
+      this.props.onChange({ [this.props.label]: e.target.value }, e)
     } else {
-      this.props.onChange(e.target.value)
+      this.props.onChange(e.target.value, e)
     }
 
     this.setState({ value: e.target.value })
   }
 
-  handleKeyDown = (e: any) => {
+  handleKeyDown = (e) => {
     const number = Number(e.target.value)
     if (number) {
       const amount = this.props.arrowOffset || 1
@@ -55,9 +50,9 @@ export class EditableInput extends React.Component {
       // Up
       if (e.keyCode === 38) {
         if (this.props.label !== null) {
-          this.props.onChange({ [this.props.label]: number + amount })
+          this.props.onChange({ [this.props.label]: number + amount }, e)
         } else {
-          this.props.onChange(number + amount)
+          this.props.onChange(number + amount, e)
         }
 
         this.setState({ value: number + amount })
@@ -66,9 +61,9 @@ export class EditableInput extends React.Component {
       // Down
       if (e.keyCode === 40) {
         if (this.props.label !== null) {
-          this.props.onChange({ [this.props.label]: number - amount })
+          this.props.onChange({ [this.props.label]: number - amount }, e)
         } else {
-          this.props.onChange(number - amount)
+          this.props.onChange(number - amount, e)
         }
 
         this.setState({ value: number - amount })
@@ -76,16 +71,16 @@ export class EditableInput extends React.Component {
     }
   }
 
-  handleDrag = (e: any) => {
+  handleDrag = (e) => {
     if (this.props.dragLabel) {
       const newValue = Math.round(this.props.value + e.movementX)
       if (newValue >= 0 && newValue <= this.props.dragMax) {
-        this.props.onChange({ [this.props.label]: newValue })
+        this.props.onChange({ [this.props.label]: newValue }, e)
       }
     }
   }
 
-  handleMouseDown = (e: any) => {
+  handleMouseDown = (e) => {
     if (this.props.dragLabel) {
       e.preventDefault()
       this.handleDrag(e)
@@ -99,12 +94,17 @@ export class EditableInput extends React.Component {
   }
 
   unbindEventListeners = () => {
-    window.removeEventListener('mousemove', this.handleChange)
+    window.removeEventListener('mousemove', this.handleDrag)
     window.removeEventListener('mouseup', this.handleMouseUp)
   }
 
-  render(): any {
+  render() {
     const styles = reactCSS({
+      'default': {
+        wrap: {
+          position: 'relative',
+        },
+      },
       'user-override': {
         wrap: this.props.style && this.props.style.wrap ? this.props.style.wrap : {},
         input: this.props.style && this.props.style.input ? this.props.style.input : {},
@@ -120,7 +120,7 @@ export class EditableInput extends React.Component {
     }, this.props)
 
     return (
-      <div style={ styles.wrap } ref="container">
+      <div style={ styles.wrap }>
         <input
           style={ styles.input }
           ref="input"
@@ -129,9 +129,10 @@ export class EditableInput extends React.Component {
           onChange={ this.handleChange }
           onBlur={ this.handleBlur }
           onFocus={ this.props.onFocus }
+          placeholder={ this.props.placeholder }
         />
         { this.props.label ? (
-          <span style={ styles.label } ref="label" onMouseDown={ this.handleMouseDown }>
+          <span style={ styles.label } onMouseDown={ this.handleMouseDown }>
             { this.props.label }
           </span>
         ) : null }

@@ -1,12 +1,12 @@
-'use strict';
+'use strict'
 
-import React from 'react';
-import reactCSS from 'reactcss';
+import React from 'react'
+import reactCSS from 'reactcss'
 
 class Grid extends React.Component {
 
   render() {
-
+    const isMobile = document.getElementById('root').clientWidth < 500
     const styles = reactCSS({
       'default': {
         grid: {
@@ -52,7 +52,18 @@ class Grid extends React.Component {
           height: '100%',
         },
         main: {
-          paddingLeft: '455px',
+          paddingLeft: '460px',
+        },
+      },
+
+      'preset-four': {
+        left: {
+          width: '170px',
+          position: 'absolute',
+          height: '100%',
+        },
+        main: {
+          paddingLeft: '210px',
         },
       },
 
@@ -92,24 +103,35 @@ class Grid extends React.Component {
           display: 'none',
         },
       },
+      'mobile-four': {
+        grid: {
+          display: 'none',
+        },
+      },
     }, {
-      'mobile-default': this.props.preset === 'default' && document.getElementById('root').clientWidth < 500,
-      'mobile-one': this.props.preset === 'one' && document.getElementById('root').clientWidth < 500,
-      'mobile-two': this.props.preset === 'two' && document.getElementById('root').clientWidth < 500,
-      'mobile-three': this.props.preset === 'three' && document.getElementById('root').clientWidth < 500,
-    }, this.props);
+      'preset-default': this.props.preset === 'default',
+      'preset-one': this.props.preset === 'one',
+      'preset-two': this.props.preset === 'two',
+      'preset-three': this.props.preset === 'three',
+      'preset-four': this.props.preset === 'four',
+      'mobile-default': this.props.preset === 'default' && isMobile,
+      'mobile-one': this.props.preset === 'one' && isMobile,
+      'mobile-two': this.props.preset === 'two' && isMobile,
+      'mobile-three': this.props.preset === 'three' && isMobile,
+      'mobile-four': this.props.preset === 'four' && isMobile,
+    })
 
     return (
       <div style={ styles.grid }>
         <div style={ styles.left }>{ this.props.children[0] }</div>
         <div style={ styles.main }>{ this.props.children[1] }</div>
       </div>
-    );
+    )
   }
 }
 
 Grid.defaultProps = {
   preset: 'default',
-};
+}
 
-export default Grid;
+export default Grid

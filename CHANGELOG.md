@@ -1,5 +1,58 @@
 # Changelog
 
+## 2.6.0
+
+- Be React Version Agnostic [#297](https://github.com/casesandberg/react-color/pull/297)
+
+## 2.5.0
+
+- Add `circleSize` and `circleSpacing` to CirclePicker [#295](https://github.com/casesandberg/react-color/pull/295)
+- Remove React and React DOM Peer Dependencies [#293](https://github.com/casesandberg/react-color/pull/293)
+- Update Jest Snapshots for ReactCSS 1.1.0 [#294](https://github.com/casesandberg/react-color/pull/294)
+
+## 2.4.3
+
+- Revert iFrame Mouse Positioning Fix [#286](https://github.com/casesandberg/react-color/pull/286)
+- Correct Path for Components in Documentation [#287](https://github.com/casesandberg/react-color/pull/287)
+- Use Inline Style on Saturation Component [#288](https://github.com/casesandberg/react-color/pull/288)
+- Pass Up Events to `onChange` [#289](https://github.com/casesandberg/react-color/pull/289)
+
+## 2.4.2
+
+- Add react-addons-shallow-compare back to dependencies [#282](https://github.com/casesandberg/react-color/pull/282)
+
+## 2.4.1
+
+- Smaller NPM Package Size [#280](https://github.com/casesandberg/react-color/pull/280)
+
+## 2.4.0 (20 October 2016)
+
+- Add `none` and `top-right` as triangle direction for Block, Github and Twitter
+
+## 2.3.4 (13 October 2016)
+
+- Add `cursor: pointer` to Photoshop Buttons
+- Remove correct event listener in `EditableInput`
+- Add Individual pickers API Documentation
+- Add `Checkboard` to docs
+
+## 2.3.3 (8 October 2016)
+
+- Overwrite Alpha Styles
+
+## 2.3.2 (21 September 2016)
+
+- EditableInput stacking issue fixed
+
+## 2.3.1 (21 September 2016)
+
+- CompactPicker handle hex changes
+- Add `name-picker` class to each picker
+
+## 2.3.0 (17 September 2016)
+
+- 6 New Pickers (Block, Github, Twitter, Hue, Alhpa and Circle)
+
 ## 2.2.7 (1 September 2016)
 
 - Eslint
